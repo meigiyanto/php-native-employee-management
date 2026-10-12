@@ -24,13 +24,13 @@ $pageTitle = $pageTitle ?? 'Data Karyawan';
                         <a class="nav-link active" aria-current="page" href="index.php">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.php?page=employees">Employee</a>
+                        <a class="nav-link" href="index.php?page=employees">Karyawan</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.php?page=departments">Department</a>
+                        <a class="nav-link" href="index.php?page=departments">Depatemen</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.php?page=positions">Position</a>
+                        <a class="nav-link" href="index.php?page=positions">Jabatan</a>
                     </li>
                     <!--
                     <li class="nav-item dropdown">

@@ -1,4 +1,3 @@
-
 <?php $pageTitle = 'Detail Karyawan'; ?>
 
 <div class="mb-4">

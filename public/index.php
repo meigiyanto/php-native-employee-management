@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 require_once __DIR__ . '/../app/config/app.php';
@@ -139,23 +138,26 @@ if (isset($_GET['page'])) {
 $controller = new DashboardController($pdo);
 $data = $controller->index();
 
-$totalEmployees = $data['totalEmployees'];
-$activeEmployees = $data['activeEmployees'];
-$totalDepartments = $data['totalDepartments'];
-$totalPositions = $data['totalPositions'];
-$recentEmployees = $data['recentEmployees'];
 
+// Data yang dikirim oleh DashboardController
+$totalEmployees = $data['totalEmployees'] ?? 0;
+$activeEmployees = $data['activeEmployees'] ?? 0;
+$totalDepartments = $data['totalDepartments'] ?? 0;
+$totalPositions = $data['totalPositions'] ?? 0;
+$recentEmployees = $data['recentEmployees'] ?? [];
+
+// Data untuk kartu statistik dashboard
 $cards = [
     [
         'title' => 'Total Karyawan',
         'value' => $totalEmployees,
-        'icon' => 'bi-people',
+        'icon' => 'bi-people-fill',
         'color' => 'primary',
     ],
     [
         'title' => 'Karyawan Aktif',
         'value' => $activeEmployees,
-        'icon' => 'bi-person-check',
+        'icon' => 'bi-person-check-fill',
         'color' => 'success',
     ],
     [
@@ -167,22 +169,23 @@ $cards = [
     [
         'title' => 'Jabatan',
         'value' => $totalPositions,
-        'icon' => 'bi-briefcase',
+        'icon' => 'bi-briefcase-fill',
         'color' => 'info',
     ],
 ];
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Dashboard Sistem Manajemen Data Karyawan">
+
     <title>Dashboard | <?= e(APP_NAME) ?></title>
 
     <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     >
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
@@ -190,168 +193,297 @@ $cards = [
     >
     <link href="assets/css/style.css" rel="stylesheet">
 </head>
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-        <div class="container-fluid">
+
+<body class="dashboard-page">
+<?php
+    $currentUser = $_SESSION['auth_user'] ?? [];
+    $userName = trim((string) ($currentUser['name'] ?? 'Pengguna'));
+    $userRole = (string) ($currentUser['role'] ?? '');
+?>
+
+    <nav class="navbar navbar-expand-lg dashboard-navbar">
+        <div class="container-fluid px-3 px-lg-4">
+
             <a class="navbar-brand fw-bold" href="index.php">
-                <i class="bi bi-people-fill me-2"></i>
+                <span class="brand-icon">
+                    <i class="bi bi-people-fill"></i>
+                </span>
                 Employee Management
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#dashboardNavbar"
+                aria-controls="dashboardNavbar"
+                aria-expanded="false"
+                aria-label="Buka navigasi"
+            >
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+            <div class="collapse navbar-collapse" id="dashboardNavbar">
+                <ul class="navbar-nav me-auto ms-lg-4 gap-lg-1">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.php">Dashboard</a>
+                        <a class="nav-link active" href="index.php">
+                            <i class="bi bi-grid-1x2 me-1"></i>
+                            Dashboard
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.php?page=employees">Employee</a>
+                        <a class="nav-link" href="index.php?page=employees">
+                            <i class="bi bi-people me-1"></i>
+                            Karyawan
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.php?page=departments">Department</a>
+                        <a class="nav-link" href="index.php?page=departments">
+                            <i class="bi bi-building me-1"></i>
+                            Departemen
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.php?page=positions">Position</a>
+                        <a class="nav-link" href="index.php?page=positions">
+                            <i class="bi bi-briefcase me-1"></i>
+                            Jabatan
+                        </a>
                     </li>
                 </ul>
-                <form class="d-flex mb-3" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
-                <form method="POST" action="index.php?page=logout">
-                    <input type="hidden" name="_token" value="<?= e(csrfToken()) ?>">
-                    <button type="submit" class="btn btn-outline-danger">
-                        Logout
-                    </button>
-                </form>
+
+                <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
+                    <div class="user-profile">
+                        <div class="user-avatar">
+                            <?= e(strtoupper(substr($userName, 0, 1))) ?>
+                        </div>
+                        <div class="user-profile-text">
+                            <span class="user-name"><?= e($userName) ?></span>
+                            <span class="user-role">
+                                <?= e(strtoupper($userRole)) ?>
+                            </span>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="index.php?page=logout">
+                        <input
+                            type="hidden"
+                            name="_token"
+                            value="<?= e(csrfToken()) ?>"
+                        >
+                        <button
+                            type="submit"
+                            class="btn btn-outline-danger btn-sm"
+                            aria-label="Logout"
+                        >
+                            <i class="bi bi-box-arrow-right me-1"></i>
+                            Keluar
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </nav>
 
-    <div class="container-fluid px-3 px-lg-4 py-4">
+    <main class="container-fluid px-3 px-lg-4 py-4 py-lg-5">
 
-        <div class="d-flex flex-wrap justify-content-between  align-items-center gap-3 mb-4">
+        <!-- Header dashboard -->
+        <section class="dashboard-welcome mb-4 mb-lg-5">
             <div>
-                <h1 class="h3 fw-bold mb-1">Dashboard</h1>
+                <span class="welcome-eyebrow">OVERVIEW</span>
+                <h1 class="welcome-title">
+                    Selamat datang, <?= e($userName) ?>!
+                </h1>
                 <p class="text-secondary mb-0">
-                    Ringkasan informasi karyawan dan organisasi.
+                    Pantau data karyawan dan struktur organisasi Anda
+                    melalui ringkasan berikut.
                 </p>
             </div>
 
-            <span class="badge text-bg-light border p-2">
-                <i class="bi bi-calendar3 me-1"></i>
-                <?= e(date('d-m-Y')) ?>
-            </span>
-        </div>
+            <div class="welcome-date">
+                <i class="bi bi-calendar3"></i>
+                <span><?= e(date('d-m-Y')) ?></span>
+            </div>
+        </section>
 
-        <div class="row g-3 mb-4">
-            <?php foreach ($cards as $card): ?>
-                <div class="col-12 col-sm-6 col-xl-3">
-                    <div class="card dashboard-card border-0 shadow-sm h-100">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <p class="text-secondary small mb-2">
-                                        <?= e($card['title']) ?>
-                                    </p>
-                                    <h2 class="h3 fw-bold mb-0">
-                                        <?= e($card['value']) ?>
-                                    </h2>
-                                </div>
-
-                                <div class="stat-icon text-bg-<?= e($card['color']) ?>">
-                                    <i class="bi <?= e($card['icon']) ?>"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        </div>
-
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white border-0 p-3 p-md-4">
-                <div class="d-flex justify-content-between
-                            align-items-center gap-2">
-                    <div>
-                        <h2 class="h5 fw-bold mb-1">
-                            Karyawan Terbaru
-                        </h2>
-                        <p class="small text-secondary mb-0">
-                            Lima data karyawan terakhir.
-                        </p>
-                    </div>
-                    <!--
-                    <button type="button" class="btn btn-primary btn-sm"
-                            disabled
-                            title="Akan diaktifkan pada tahap CRUD">
-                        <i class="bi bi-plus-lg me-1"></i>
-                        Tambah Karyawan
-                    </button>
-                    -->
+        <!-- Statistik -->
+        <section class="mb-4 mb-lg-5">
+            <div class="section-heading">
+                <div>
+                    <h2 class="section-title">Ringkasan Data</h2>
+                    <p class="section-description">
+                        Kondisi data organisasi saat ini.
+                    </p>
                 </div>
             </div>
 
+            <div class="row g-3 g-xl-4">
+                <?php foreach ($cards as $card): ?>
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <article class="stat-card h-100">
+                            <div class="stat-card-top">
+                                <span class="stat-label">
+                                    <?= e($card['title']) ?>
+                                </span>
+
+                                <span class="stat-icon stat-icon-<?= e($card['color']) ?>">
+                                    <i class="bi <?= e($card['icon']) ?>"></i>
+                                </span>
+                            </div>
+
+                            <div class="stat-value">
+                                <?= e(number_format((int) $card['value'], 0, ',', '.')) ?>
+                            </div>
+
+                            <div class="stat-card-bottom">
+                                <span class="stat-dot stat-dot-<?= e($card['color']) ?>"></span>
+                                Data terdaftar dalam sistem
+                            </div>
+                        </article>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
+
+        <!-- Akses cepat -->
+        <section class="mb-4 mb-lg-5">
+            <div class="section-heading">
+                <div>
+                    <h2 class="section-title">Akses Cepat</h2>
+                    <p class="section-description">
+                        Buka bagian yang ingin Anda kelola.
+                    </p>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-12 col-md-4">
+                    <a href="index.php?page=employees" class="quick-link">
+                        <span class="quick-link-icon quick-icon-blue">
+                            <i class="bi bi-people"></i>
+                        </span>
+                        <span class="quick-link-content">
+                            <strong>Data Karyawan</strong>
+                            <small>Lihat dan kelola data karyawan</small>
+                        </span>
+                        <i class="bi bi-arrow-up-right quick-link-arrow"></i>
+                    </a>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <a href="index.php?page=departments" class="quick-link">
+                        <span class="quick-link-icon quick-icon-purple">
+                            <i class="bi bi-building"></i>
+                        </span>
+                        <span class="quick-link-content">
+                            <strong>Departemen</strong>
+                            <small>Kelola unit organisasi</small>
+                        </span>
+                        <i class="bi bi-arrow-up-right quick-link-arrow"></i>
+                    </a>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <a href="index.php?page=positions" class="quick-link">
+                        <span class="quick-link-icon quick-icon-orange">
+                            <i class="bi bi-briefcase"></i>
+                        </span>
+                        <span class="quick-link-content">
+                            <strong>Jabatan</strong>
+                            <small>Kelola jabatan karyawan</small>
+                        </span>
+                        <i class="bi bi-arrow-up-right quick-link-arrow"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Karyawan terbaru -->
+        <section class="recent-card">
+            <div class="recent-card-header">
+                <div>
+                    <h2 class="section-title">Karyawan Terbaru</h2>
+                    <p class="section-description mb-0">
+                        Lima data karyawan yang terakhir ditambahkan.
+                    </p>
+                </div>
+
+                <a
+                    href="index.php?page=employees"
+                    class="btn btn-primary btn-sm"
+                >
+                    Lihat semua
+                    <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                <table class="table dashboard-table align-middle mb-0">
+                    <thead>
                         <tr>
-                            <th class="ps-3 ps-md-4">Kode</th>
-                            <th>Nama Karyawan</th>
+                            <th class="ps-3 ps-lg-4">Karyawan</th>
                             <th>Departemen</th>
                             <th>Jabatan</th>
                             <th>Status</th>
                         </tr>
                     </thead>
+
                     <tbody>
                     <?php if ($recentEmployees === []): ?>
                         <tr>
-                            <td colspan="5" class="text-center py-5">
-                                <i class="bi bi-inbox display-5
-                                          text-secondary"></i>
-                                <p class="fw-semibold mt-3 mb-1">
-                                    Belum ada data karyawan
-                                </p>
-                                <p class="text-secondary small mb-0">
-                                    Data karyawan akan tampil di sini
+                            <td colspan="4" class="empty-state">
+                                <i class="bi bi-inbox"></i>
+                                <strong>Belum ada data karyawan</strong>
+                                <span>
+                                    Data karyawan akan ditampilkan di sini
                                     setelah ditambahkan.
-                                </p>
+                                </span>
                             </td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($recentEmployees as $employee): ?>
+                            <?php
+                            $statusClass = match (
+                                $employee['employment_status']
+                            ) {
+                                'active' => 'success',
+                                'inactive' => 'secondary',
+                                'on_leave' => 'warning',
+                                'resigned' => 'danger',
+                                default => 'secondary',
+                            };
+                            ?>
+
                             <tr>
-                                <td class="ps-3 ps-md-4">
-                                    <?= e($employee['employee_code']) ?>
-                                </td>
-                                <td>
-                                    <div class="fw-semibold">
-                                        <?= e($employee['full_name']) ?>
+                                <td class="ps-3 ps-lg-4">
+                                    <div class="employee-cell">
+                                        <div class="employee-avatar">
+                                            <?= e(strtoupper(substr(
+                                                (string) $employee['full_name'],
+                                                0,
+                                                1
+                                            ))) ?>
+                                        </div>
+
+                                        <div class="employee-details">
+                                            <strong>
+                                                <?= e($employee['full_name']) ?>
+                                            </strong>
+                                            <span>
+                                                <?= e($employee['employee_code']) ?>
+                                            </span>
+                                            <small>
+                                                <?= e($employee['email']) ?>
+                                            </small>
+                                        </div>
                                     </div>
-                                    <div class="small text-secondary">
-                                        <?= e($employee['email']) ?>
-                                    </div>
                                 </td>
+
+                                <td><?= e($employee['department_name']) ?></td>
+                                <td><?= e($employee['position_name']) ?></td>
+
                                 <td>
-                                    <?= e($employee['department_name']) ?>
-                                </td>
-                                <td>
-                                    <?= e($employee['position_name']) ?>
-                                </td>
-                                <td>
-                                    <?php
-                                    $statusClass = match (
-                                        $employee['employment_status']
-                                    ) {
-                                        'active' => 'success',
-                                        'inactive' => 'secondary',
-                                        'on_leave' => 'warning',
-                                        'resigned' => 'danger',
-                                        default => 'secondary',
-                                    };
-                                    ?>
-                                    <span class="badge text-bg-<?= e($statusClass) ?>">
+                                    <span class="status-pill status-<?= e($statusClass) ?>">
+                                        <span class="status-indicator"></span>
                                         <?= e(statusLabel(
                                             $employee['employment_status']
                                         )) ?>
@@ -364,18 +496,27 @@ $cards = [
                 </table>
             </div>
 
-            <div class="card-footer bg-white border-0 p-3">
-                <span class="text-secondary small">
-                    Sistem Manajemen Data Karyawan
+            <div class="recent-card-footer">
+                <span>
+                    <i class="bi bi-info-circle me-1"></i>
+                    Data diperbarui berdasarkan catatan terbaru.
                 </span>
+                <a href="index.php?page=employees">
+                    Buka data karyawan
+                    <i class="bi bi-chevron-right ms-1"></i>
+                </a>
             </div>
-        </div>
+        </section>
 
-    </div>
+        <footer class="dashboard-footer">
+            Employee Management System
+            <span>&middot;</span>
+            PHP Native
+        </footer>
 
-    <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js">
-    </script>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/app.js"></script>
 </body>
 </html>

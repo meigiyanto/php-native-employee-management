@@ -32,12 +32,9 @@ $selectedPosition = (string) $value('position_id');
     <div class="card-body p-3 p-md-4">
         <form method="POST"
               action="index.php?page=<?= $isEdit ? 'employee-update' : 'employee-store' ?>">
-            <input type="hidden" name="csrf_token"
-                   value="<?= e(csrfToken()) ?>">
-
+            <input type="hidden" name="csrf_token" value="<?= e(csrfToken()) ?>">
             <?php if ($isEdit): ?>
-                <input type="hidden" name="id"
-                       value="<?= (int) $employee['id'] ?>">
+                <input type="hidden" name="id" value="<?= (int) $employee['id'] ?>">
             <?php endif; ?>
 
             <div class="row g-3">
@@ -53,6 +50,7 @@ $selectedPosition = (string) $value('position_id');
                             class="form-control"
                             value="<?= e($value('employee_code')) ?>"
                             readonly
+                            disabled
                         >
                         <div class="form-text">
                             Kode karyawan dibuat otomatis dan tidak dapat diubah.
@@ -64,6 +62,7 @@ $selectedPosition = (string) $value('position_id');
                             class="form-control"
                             value="Dibuat otomatis saat disimpan"
                             readonly
+                            disabled
                         >
                         <div class="form-text">
                             Kode akan dibuat setelah data karyawan berhasil disimpan.
@@ -73,22 +72,17 @@ $selectedPosition = (string) $value('position_id');
 
                 <div class="col-12 col-md-6">
                     <label class="form-label">Nama Lengkap *</label>
-                    <input name="full_name" class="form-control"
-                           maxlength="150" required
-                           value="<?= e($value('full_name')) ?>">
+                    <input name="full_name" class="form-control" maxlength="150" required value="<?= e($value('full_name')) ?>">
                 </div>
 
                 <div class="col-12 col-md-6">
                     <label class="form-label">Email *</label>
-                    <input type="email" name="email" class="form-control"
-                           maxlength="150" required
-                           value="<?= e($value('email')) ?>">
+                    <input type="email" name="email" class="form-control" maxlength="150" required value="<?= e($value('email')) ?>">
                 </div>
 
                 <div class="col-12 col-md-6">
                     <label class="form-label">Nomor Telepon</label>
-                    <input name="phone" class="form-control" maxlength="25"
-                           value="<?= e($value('phone')) ?>">
+                    <input name="phone" class="form-control" maxlength="25" value="<?= e($value('phone')) ?>">
                 </div>
 
                 <div class="col-12 col-md-6">
@@ -103,21 +97,17 @@ $selectedPosition = (string) $value('position_id');
 
                 <div class="col-12 col-md-6">
                     <label class="form-label">Tanggal Lahir</label>
-                    <input type="date" name="birth_date" class="form-control"
-                           value="<?= e($value('birth_date')) ?>">
+                    <input type="date" name="birth_date" class="form-control" value="<?= e($value('birth_date')) ?>">
                 </div>
 
                 <div class="col-12 col-md-6">
                     <label class="form-label">Tanggal Masuk *</label>
-                    <input type="date" name="hire_date" class="form-control"
-                           required value="<?= e($value('hire_date')) ?>">
+                    <input type="date" name="hire_date" class="form-control" required value="<?= e($value('hire_date')) ?>">
                 </div>
 
                 <div class="col-12 col-md-6">
                     <label class="form-label">Departemen *</label>
-                    <select name="department_id" id="department_id"
-                            class="form-select" required>
-                        <option value="">Pilih departemen</option>
+                    <select name="department_id" id="department_id" class="form-select" required>                        <option value="">Pilih departemen</option>
                         <?php foreach ($departments as $department): ?>
                             <option value="<?= (int) $department['id'] ?>"
                                 <?= $selectedDepartment === (string) $department['id'] ? 'selected' : '' ?>>
@@ -129,8 +119,7 @@ $selectedPosition = (string) $value('position_id');
 
                 <div class="col-12 col-md-6">
                     <label class="form-label">Jabatan *</label>
-                    <select name="position_id" id="position_id"
-                            class="form-select" required>
+                    <select name="position_id" id="position_id" class="form-select" required>
                         <option value="">Pilih jabatan</option>
                         <?php foreach ($positions as $position): ?>
                             <option
@@ -168,15 +157,12 @@ $selectedPosition = (string) $value('position_id');
 
                 <div class="col-12 col-md-6">
                     <label class="form-label">Gaji (Rp) *</label>
-                    <input type="number" name="salary" class="form-control"
-                           min="0" max="9999999999999.99" step="0.01"
-                           required value="<?= e($value('salary', '0')) ?>">
+                    <input type="number" name="salary" class="form-control" min="0" max="9999999999999.99" step="0.01" required value="<?= e($value('salary', '0')) ?>">
                 </div>
 
                 <div class="col-12">
                     <label class="form-label">Alamat</label>
-                    <textarea name="address" class="form-control"
-                              rows="3"><?= e($value('address')) ?></textarea>
+                    <textarea name="address" class="form-control" rows="3"><?= e($value('address')) ?></textarea>
                 </div>
             </div>
 
@@ -185,8 +171,7 @@ $selectedPosition = (string) $value('position_id');
                     <i class="bi bi-check-lg me-1"></i>
                     <?= $isEdit ? 'Simpan Perubahan' : 'Simpan Karyawan' ?>
                 </button>
-                <a href="index.php?page=employees"
-                   class="btn btn-outline-secondary">Batal</a>
+                <a href="index.php?page=employees" class="btn btn-outline-secondary">Batal</a>
             </div>
         </form>
     </div>
