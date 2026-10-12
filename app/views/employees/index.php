@@ -61,7 +61,7 @@ if (!empty($filters['employment_status'])) {
 
 <div class="card mb-4">
     <div class="card-body">
-        <h2 class="h5 fw-bold mb-2">
+        <h2 class="h5 fw-bold mb-3">
             <i class="bi bi-file-earmark-arrow-up me-2"></i>
             Import Data Karyawan
         </h2>
@@ -118,7 +118,7 @@ if (!empty($filters['employment_status'])) {
             </div>
         </form>
 
-        <form method="GET">
+        <form method="GET" class="mt-3">
             <input type="hidden" name="page" value="employees">
             <div class="row g-3 mb-3">
                 <div class="col-sm-6">
@@ -214,116 +214,123 @@ if (!empty($filters['employment_status'])) {
             </div>
         </form>
 
+        <form
+            id="bulk-delete-form"
+            method="POST"
+            action="index.php?page=employee-bulk-delete"
+            onsubmit="return confirm('Yakin ingin menghapus semua karyawan yang dipilih? Tindakan ini tidak dapat dibatalkan.');"
+        >
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="<?= e(csrfToken()) ?>"
+            >
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-4 mb-3">
+                <span class="text-secondary">
+                    Dipilih: <strong id="selected-count">0</strong> karyawan
+                </span>
+
+                <button
+                    type="submit"
+                    id="bulk-delete-button"
+                    class="btn btn-danger btn-sm"
+                    disabled
+                >
+                    <i class="bi bi-trash me-1"></i>
+                    Hapus yang Dipilih
+                </button>
+            </div>
+        </form>
+
         <div class="table-responsive mt-4">
             <table class="table table-hover align-middle mb-0 text-nowrap">
-                <form id="bulk-delete-form" method="POST"  action="index.php?page=employee-bulk-delete" onsubmit="return confirm('Yakin ingin menghapus semua karyawan yang dipilih? Tindakan ini tidak dapat dibatalkan.');">
-                    <input type="hidden" name="csrf_token" value="<?= e(csrfToken()) ?>">
-                    <thead class="table-light">
-                        <tr>
-                            <th>
-                                <span class="visually-hidden">Pilih</span>
-                            </th>
-                            <th>Kode</th>
-                            <th>Nama</th>
-                            <th>Departemen</th>
-                            <th>Jabatan</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <?php if (!$employees): ?>
-                        <tr>
-                            <td colspan="6" class="text-center py-5">
-                                Belum ada data karyawan.
-                            </td>
-                        </tr>
-                    <?php else: ?>
-                        <?php $i = $startRecord; ?>
-                        <?php foreach ($employees as $item): ?>
-                            <tr>
-                                <td>
-                                    <input
-                                        type="checkbox"
-                                        class="form-check-input employee-checkbox"
-                                        name="employee_ids[]"
-                                        value="<?= (int) $item['id'] ?>"
-                                        form="bulk-delete-form"
-                                        aria-label="Pilih <?= e($item['full_name']) ?>"
-                                    >
-                                    <span class="ms-1"><?= $i++ ?></span>
-                                </td>
-                                <td><?= e($item['employee_code']) ?></td>
-                                <td>
-                                    <div class="fw-semibold">
-                                        <?= e($item['full_name']) ?>
-                                    </div>
-                                    <small class="text-secondary">
-                                        <?= e($item['email']) ?>
-                                    </small>
-                                </td>
-                                <td><?= e($item['department_name']) ?></td>
-                                <td><?= e($item['position_name']) ?></td>
-                                <td>
-                                    <?php
-                                    $badgeClass = match ($item['employment_status']) {
-                                        'active' => 'success',
-                                        'inactive' => 'secondary',
-                                        'on_leave' => 'warning',
-                                        'resigned' => 'danger',
-                                        default => 'secondary',
-                                    };
-                                    ?>
-                                    <span class="badge text-bg-<?= e($badgeClass) ?>">
-                                        <?= e(statusLabel($item['employment_status'])) ?>
-                                    </span>
-                                </td>
-                                <td class="text-nowrap">
-                                    <a class="btn btn-sm btn-outline-primary"
-                                       href="index.php?page=employee-show&id=<?= (int) $item['id'] ?>">
-                                        Detail
-                                    </a>
-                                    <a class="btn btn-sm btn-outline-warning"
-                                       href="index.php?page=employee-edit&id=<?= (int) $item['id'] ?>">
-                                        Edit
-                                    </a>
-                                    <form method="POST"
-                                          action="index.php?page=employee-delete"
-                                          class="d-inline"
-                                          onsubmit="return confirm('Hapus karyawan ini?')">
-                                        <input type="hidden" name="csrf_token"
-                                               value="<?= e(csrfToken()) ?>">
-                                        <input type="hidden" name="id"
-                                               value="<?= (int) $item['id'] ?>">
-                                        <button class="btn btn-sm btn-outline-danger">
-                                            Hapus
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                    </tbody>
-                    <tfoot>
+                <thead class="table-light">
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="select-all-employees" class="form-check-input" aria-label="Pilih semua karyawan pada halaman ini">
+                        </th>
+                        <th>Kode</th>
+                        <th>Nama</th>
+                        <th>Departemen</th>
+                        <th>Jabatan</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php if (!$employees): ?>
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            Belum ada data karyawan.
+                        </td>
+                    </tr>
+                <?php else: ?>
+                    <?php $i = $startRecord; ?>
+                    <?php foreach ($employees as $item): ?>
                         <tr>
                             <td>
-                                <input type="checkbox" id="select-all-employees" class="form-check-input">
-                            </td>
-                            <td colspan="6">
-                                <button
-                                    type="submit"
-                                    id="bulk-delete-button"
-                                    class="btn btn-danger btn-sm"
-                                    disabled
+                                <input
+                                    type="checkbox"
+                                    class="form-check-input employee-checkbox"
+                                    name="employee_ids[]"
+                                    value="<?= (int) $item['id'] ?>"
+                                    form="bulk-delete-form"
+                                    aria-label="Pilih <?= e($item['full_name']) ?>"
                                 >
-                                    <i class="bi bi-trash me-1"></i>
-                                    Hapus yang Dipilih
-                                    (<span id="selected-count">0</span>)
-                                </button>
+                                <span class="ms-1"><?= $i++ ?></span>
+                            </td>
+                            <td><?= e($item['employee_code']) ?></td>
+                            <td>
+                                <div class="fw-semibold">
+                                    <?= e($item['full_name']) ?>
+                                </div>
+                                <small class="text-secondary">
+                                    <?= e($item['email']) ?>
+                                </small>
+                            </td>
+                            <td><?= e($item['department_name']) ?></td>
+                            <td><?= e($item['position_name']) ?></td>
+                            <td>
+                                <?php
+                                $badgeClass = match ($item['employment_status']) {
+                                    'active' => 'success',
+                                    'inactive' => 'secondary',
+                                    'on_leave' => 'warning',
+                                    'resigned' => 'danger',
+                                    default => 'secondary',
+                                };
+                                ?>
+                                <span class="badge text-bg-<?= e($badgeClass) ?>">
+                                    <?= e(statusLabel($item['employment_status'])) ?>
+                                </span>
+                            </td>
+                            <td class="text-nowrap">
+                                <a class="btn btn-sm btn-outline-primary"
+                                   href="index.php?page=employee-show&id=<?= (int) $item['id'] ?>">
+                                    Detail
+                                </a>
+                                <a class="btn btn-sm btn-outline-warning"
+                                   href="index.php?page=employee-edit&id=<?= (int) $item['id'] ?>">
+                                    Edit
+                                </a>
+                                <form method="POST"
+                                      action="index.php?page=employee-delete"
+                                      class="d-inline"
+                                      onsubmit="return confirm('Hapus karyawan ini?')">
+                                    <input type="hidden" name="csrf_token"
+                                           value="<?= e(csrfToken()) ?>">
+                                    <input type="hidden" name="id"
+                                           value="<?= (int) $item['id'] ?>">
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        Hapus
+                                    </button>
+                                </form>
                             </td>
                         </tr>
-                    </tfoot>
-                </form>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                </tbody>
             </table>
 
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-4">
