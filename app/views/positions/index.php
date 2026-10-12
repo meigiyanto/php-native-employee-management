@@ -62,7 +62,7 @@ unset($_SESSION['flash']);
                         </td>
                     </tr>
                 <?php else: ?>
-                    <?php $i = 1; ?>
+                    <?php $i = $startRecord; ?>
                     <?php foreach ($positions as $position): ?>
                         <tr>
                             <td><?= $i++ ?></td>
@@ -119,5 +119,84 @@ unset($_SESSION['flash']);
                 </tbody>
             </table>
         </div>
+
+        <?php
+        $paginationParams = ['page' => 'positions'];
+
+        if ($search !== '') {
+            $paginationParams['search'] = $search;
+        }
+
+        $firstPage = max(1, $currentPage - 2);
+        $lastPage = min($totalPages, $currentPage + 2);
+        ?>
+
+        <div class="d-flex flex-column flex-md-row
+                    justify-content-between align-items-md-center
+                    gap-3 mt-3">
+
+            <p class="text-secondary small mb-0">
+                Menampilkan <?= $startRecord ?>–<?= $endRecord ?>
+                dari <?= $totalPositions ?> jabatan
+            </p>
+
+            <?php if ($totalPages > 1): ?>
+                <nav aria-label="Navigasi halaman data jabatan">
+                    <ul class="pagination pagination-sm mb-0">
+
+                        <li class="page-item <?= $currentPage <= 1 ? 'disabled' : '' ?>">
+                            <?php if ($currentPage > 1): ?>
+                                <a class="page-link"
+                                   href="?<?= e(http_build_query(
+                                       array_merge($paginationParams, [
+                                           'p' => $currentPage - 1,
+                                       ])
+                                   )) ?>">
+                                    Sebelumnya
+                                </a>
+                            <?php else: ?>
+                                <span class="page-link">Sebelumnya</span>
+                            <?php endif; ?>
+                        </li>
+
+                        <?php for ($number = $firstPage; $number <= $lastPage; $number++): ?>
+                            <li class="page-item <?= $number === $currentPage ? 'active' : '' ?>">
+                                <?php if ($number === $currentPage): ?>
+                                    <span class="page-link" aria-current="page">
+                                        <?= $number ?>
+                                    </span>
+                                <?php else: ?>
+                                    <a class="page-link"
+                                       href="?<?= e(http_build_query(
+                                           array_merge($paginationParams, [
+                                               'p' => $number,
+                                           ])
+                                       )) ?>">
+                                        <?= $number ?>
+                                    </a>
+                                <?php endif; ?>
+                            </li>
+                        <?php endfor; ?>
+
+                        <li class="page-item <?= $currentPage >= $totalPages ? 'disabled' : '' ?>">
+                            <?php if ($currentPage < $totalPages): ?>
+                                <a class="page-link"
+                                   href="?<?= e(http_build_query(
+                                       array_merge($paginationParams, [
+                                           'p' => $currentPage + 1,
+                                       ])
+                                   )) ?>">
+                                    Berikutnya
+                                </a>
+                            <?php else: ?>
+                                <span class="page-link">Berikutnya</span>
+                            <?php endif; ?>
+                        </li>
+
+                    </ul>
+                </nav>
+            <?php endif; ?>
+        </div>
+
     </div>
 </div>

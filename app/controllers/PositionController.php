@@ -157,15 +157,51 @@ final class PositionController
         }
     }
 
+
     public function index(): void
     {
         $this->requireRole(['admin', 'hr']);
 
         $search = trim((string) ($_GET['search'] ?? ''));
 
+        $model = $this->model();
+        $perPage = 10;
+        $totalPositions = $model->countAll($search);
+        $totalPages = max(
+            1,
+            (int) ceil($totalPositions / $perPage)
+        );
+
+        $requestedPage = filter_var(
+            $_GET['p'] ?? 1,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]]
+        );
+
+        $currentPage = $requestedPage === false
+            ? 1
+            : min($requestedPage, $totalPages);
+
+        $offset = ($currentPage - 1) * $perPage;
+
+        $positions = $model->all(
+            $search,
+            $perPage,
+            $offset
+        );
+
         $this->render('index', [
-            'positions' => $this->model()->all($search),
+            'positions' => $positions,
             'search' => $search,
+            'currentPage' => $currentPage,
+            'perPage' => $perPage,
+            'totalPositions' => $totalPositions,
+            'totalPages' => $totalPages,
+            'startRecord' => $totalPositions > 0 ? $offset + 1 : 0,
+            'endRecord' => min(
+                $offset + $perPage,
+                $totalPositions
+            ),
         ]);
     }
 

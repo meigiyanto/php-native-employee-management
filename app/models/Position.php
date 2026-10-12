@@ -8,8 +8,15 @@ final class Position
         private PDO $pdo
     ) {}
 
-    public function all(string $search = ''): array
-    {
+
+    public function all(
+        string $search = '',
+        int $limit = 10,
+        int $offset = 0
+    ): array {
+        $limit = max(1, min($limit, 100));
+        $offset = max(0, $offset);
+
         $sql = "
             SELECT
                 p.id,
@@ -48,12 +55,46 @@ final class Position
             ];
         }
 
-        $sql .= ' ORDER BY d.name ASC, p.name ASC';
+        $sql .= ' ORDER BY d.name ASC, p.name ASC
+                  LIMIT ' . $limit . ' OFFSET ' . $offset;
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function countAll(string $search = ''): int
+    {
+        $sql = "
+            SELECT COUNT(*)
+            FROM positions p
+            INNER JOIN departments d
+                ON d.id = p.department_id
+        ";
+
+        $params = [];
+
+        if ($search !== '') {
+            $sql .= "
+                WHERE p.name LIKE :search_name
+                   OR p.description LIKE :search_description
+                   OR d.name LIKE :search_department
+            ";
+
+            $keyword = '%' . $search . '%';
+
+            $params = [
+                'search_name' => $keyword,
+                'search_description' => $keyword,
+                'search_department' => $keyword,
+            ];
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
     }
 
     public function find(int $id): ?array
