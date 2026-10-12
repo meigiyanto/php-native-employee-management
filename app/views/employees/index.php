@@ -38,6 +38,7 @@
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light">
                 <tr>
+                    <th></th>
                     <th>Kode</th>
                     <th>Nama</th>
                     <th>Departemen</th>
@@ -54,8 +55,10 @@
                     </td>
                 </tr>
             <?php else: ?>
+                <?php $i = 1; ?>
                 <?php foreach ($employees as $item): ?>
                     <tr>
+                        <td><?= $i++ ?></td>
                         <td><?= e($item['employee_code']) ?></td>
                         <td>
                             <div class="fw-semibold">

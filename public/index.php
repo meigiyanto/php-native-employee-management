@@ -13,6 +13,8 @@ require_once __DIR__ . '/../app/models/Employee.php';
 require_once __DIR__ . '/../app/controllers/EmployeeController.php';
 require_once __DIR__ . '/../app/models/Department.php';
 require_once __DIR__ . '/../app/controllers/DepartmentController.php';
+require_once __DIR__ . '/../app/models/Position.php';
+require_once __DIR__ . '/../app/controllers/PositionController.php';
 
 if (isset($_GET['page'])) {
     $employeeController = new EmployeeController($pdo);
@@ -67,6 +69,14 @@ if (isset($_GET['page'])) {
         'department-store' => ['POST', 'store'],
         'department-update' => ['POST', 'update'],
         'department-delete' => ['POST', 'delete'],
+
+        'positions' => ['GET', 'index'],
+        'position-create' => ['GET', 'create'],
+        'position-show' => ['GET', 'show'],
+        'position-edit' => ['GET', 'edit'],
+        'position-store' => ['POST', 'store'],
+        'position-update' => ['POST', 'update'],
+        'position-delete' => ['POST', 'delete'],
     ];
 
     if (!isset($routes[$page])) {
@@ -82,7 +92,6 @@ if (isset($_GET['page'])) {
         exit('Metode permintaan tidak diizinkan.');
     }
 
-    // $employeeController->$action();
     $departmentPages = [
         'departments',
         'department-create',
@@ -93,9 +102,22 @@ if (isset($_GET['page'])) {
         'department-delete',
     ];
 
+    $positionPages = [
+        'positions',
+        'position-create',
+        'position-show',
+        'position-edit',
+        'position-store',
+        'position-update',
+        'position-delete',
+    ];
+
     if (in_array($page, $departmentPages, true)) {
         $departmentController = new DepartmentController($pdo);
         $departmentController->$action();
+    } elseif (in_array($page, $positionPages, true)) {
+        $positionController = new PositionController($pdo);
+        $positionController->$action();
     } else {
         $employeeController->$action();
     }
@@ -159,29 +181,41 @@ $cards = [
     <link href="assets/css/style.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-        <div class="container-fluid px-3 px-lg-4">
+        <div class="container-fluid">
             <a class="navbar-brand fw-bold" href="index.php">
                 <i class="bi bi-people-fill me-2"></i>
                 Employee Management
             </a>
-
-            <span class="navbar-text text-white small">
-                Panel Administrasi
-            </span>
-
-            <form method="POST" action="index.php?page=logout">
-                <input
-                    type="hidden"
-                    name="_token"
-                    value="<?= e(csrfToken()) ?>"
-                >
-
-                <button type="submit" class="btn btn-outline-danger">
-                    Logout
-                </button>
-            </form>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="index.php">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.php?page=employees">Employee</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.php?page=departments">Department</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.php?page=positions">Position</a>
+                    </li>
+                </ul>
+                <form class="d-flex mb-3" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+                <form method="POST" action="index.php?page=logout">
+                    <input type="hidden" name="_token" value="<?= e(csrfToken()) ?>">
+                    <button type="submit" class="btn btn-outline-danger">
+                        Logout
+                    </button>
+                </form>
+            </div>
         </div>
     </nav>
 
