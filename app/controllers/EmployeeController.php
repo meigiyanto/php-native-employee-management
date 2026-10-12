@@ -304,13 +304,11 @@ final class EmployeeController
     public function store(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            exit('Metode tidak diizinkan.');
+            renderError(405);
         }
 
         if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
-            http_response_code(419);
-            exit('Token keamanan tidak valid. Muat ulang halaman dan coba lagi.');
+            renderError(419);
         }
 
         $input = $this->formData($_POST);
@@ -343,8 +341,7 @@ final class EmployeeController
         $employee = $id ? $this->model()->find($id) : null;
 
         if (!$employee) {
-            http_response_code(404);
-            exit('Data karyawan tidak ditemukan.');
+            renderError(404);
         }
 
         $this->render('show', ['employee' => $employee]);
@@ -356,8 +353,7 @@ final class EmployeeController
         $employee = $id ? $this->model()->find($id) : null;
 
         if (!$employee) {
-            http_response_code(404);
-            exit('Data karyawan tidak ditemukan.');
+            renderError(404);
         }
 
         $this->render('edit', [
@@ -371,21 +367,18 @@ final class EmployeeController
     public function update(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            exit('Metode tidak diizinkan.');
+            renderError(405);
         }
 
         if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
-            http_response_code(419);
-            exit('Token keamanan tidak valid. Muat ulang halaman dan coba lagi.');
+            renderError(419);
         }
 
         $id = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
         $existing = $id ? $this->model()->find($id) : null;
 
         if (!$existing) {
-            http_response_code(404);
-            exit('Data karyawan tidak ditemukan.');
+            renderError(404);
         }
 
         $input = $this->formData($_POST);
@@ -415,13 +408,11 @@ final class EmployeeController
     public function delete(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            exit('Metode tidak diizinkan.');
+            renderError(405);
         }
 
         if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
-            http_response_code(419);
-            exit('Token keamanan tidak valid.');
+            renderError(419);
         }
 
         $id = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
@@ -608,13 +599,11 @@ final class EmployeeController
     public function importCsv(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            exit('Metode tidak diizinkan.');
+            renderError(405);
         }
 
         if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
-            http_response_code(419);
-            exit('Token keamanan tidak valid. Muat ulang halaman.');
+            renderError(419);
         }
 
         if (
@@ -989,13 +978,11 @@ final class EmployeeController
     public function bulkDelete(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            exit('Metode tidak diizinkan.');
+            renderError(405);
         }
 
         if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
-            http_response_code(419);
-            exit('Token keamanan tidak valid. Muat ulang halaman.');
+            renderError(419);
         }
 
         $submittedIds = $_POST['employee_ids'] ?? [];

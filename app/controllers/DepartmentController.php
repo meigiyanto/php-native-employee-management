@@ -18,8 +18,7 @@ final class DepartmentController
         $role = $_SESSION['auth_user']['role'] ?? '';
 
         if (!in_array($role, $roles, true)) {
-            http_response_code(403);
-            exit('Kamu tidak memiliki izin untuk melakukan tindakan ini.');
+            renderError(403);
         }
     }
 
@@ -94,13 +93,11 @@ final class DepartmentController
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Allow: POST');
-            http_response_code(405);
-            exit('Metode permintaan tidak diizinkan.');
+            renderError(405);
         }
 
         if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
-            http_response_code(419);
-            exit('Token keamanan tidak valid. Muat ulang halaman.');
+            renderError(419);
         }
     }
 
@@ -163,8 +160,7 @@ final class DepartmentController
         $department = $id ? $this->model()->find($id) : null;
 
         if (!$department) {
-            http_response_code(404);
-            exit('Departemen tidak ditemukan.');
+            renderError(404);
         }
 
         $this->render('show', ['department' => $department]);
@@ -178,8 +174,7 @@ final class DepartmentController
         $department = $id ? $this->model()->find($id) : null;
 
         if (!$department) {
-            http_response_code(404);
-            exit('Departemen tidak ditemukan.');
+            renderError(404);
         }
 
         $this->render('edit', [
@@ -197,8 +192,7 @@ final class DepartmentController
         $existing = $id ? $this->model()->find($id) : null;
 
         if (!$existing) {
-            http_response_code(404);
-            exit('Departemen tidak ditemukan.');
+            renderError(404);
         }
 
         $input = $this->formData($_POST);

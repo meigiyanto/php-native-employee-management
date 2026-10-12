@@ -23,13 +23,11 @@ final class AuthController
     public function authenticate(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            exit('Metode tidak diizinkan.');
+            renderError(405);
         }
 
         if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
-            http_response_code(419);
-            exit('Token keamanan tidak valid. Muat ulang halaman.');
+            renderError(419);
         }
 
         $email = trim((string) ($_POST['email'] ?? ''));
@@ -74,13 +72,11 @@ final class AuthController
     public function logout(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            exit('Metode tidak diizinkan.');
+            renderError(405);
         }
 
         if (!verifyCsrfToken($_POST['_token'] ?? null)) {
-            http_response_code(419);
-            exit('Token keamanan tidak valid. Muat ulang halaman.');
+            renderError(419);
         }
 
         $_SESSION = [];

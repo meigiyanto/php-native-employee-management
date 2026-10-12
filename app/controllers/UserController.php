@@ -16,8 +16,7 @@ final class UserController
     private function requireAdmin(): void
     {
         if (($_SESSION['auth_user']['role'] ?? '') !== 'admin') {
-            http_response_code(403);
-            exit('Akses ditolak. Halaman ini hanya untuk admin.');
+            renderError(403);
         }
     }
 
@@ -25,13 +24,11 @@ final class UserController
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Allow: POST');
-            http_response_code(405);
-            exit('Metode permintaan tidak diizinkan.');
+            renderError(405);
         }
 
         if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
-            http_response_code(419);
-            exit('Token keamanan tidak valid. Muat ulang halaman.');
+            renderError(419);
         }
     }
 
@@ -204,8 +201,7 @@ final class UserController
         $user = $id ? $this->model()->find($id) : null;
 
         if (!$user) {
-            http_response_code(404);
-            exit('Pengguna tidak ditemukan.');
+            renderError(404);
         }
 
         $user['password'] = '';
@@ -225,8 +221,7 @@ final class UserController
         $existing = $id ? $this->model()->find($id) : null;
 
         if (!$existing) {
-            http_response_code(404);
-            exit('Pengguna tidak ditemukan.');
+            renderError(404);
         }
 
         $input = $this->formData($_POST);

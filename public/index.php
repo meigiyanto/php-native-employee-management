@@ -51,8 +51,7 @@ if (isset($_GET['page'])) {
 
     // Pastikan role pengguna valid.
     if (!in_array($_SESSION['auth_user']['role'] ?? '', ['admin', 'hr'], true)) {
-        http_response_code(403);
-        exit('Akses ditolak.');
+        renderError(403);
     }
 
     $routes = [
@@ -63,16 +62,9 @@ if (isset($_GET['page'])) {
         'employee-store' => ['POST', 'store'],
         'employee-update' => ['POST', 'update'],
         'employee-delete' => ['POST', 'delete'],
-
-        'employees' => ['GET', 'index'],
         'employee-export' => ['GET', 'exportCsv'],
-        'employee-create' => ['GET', 'create'],
-
-        'employees' => ['GET', 'index'],
-        'employee-import-template' => ['GET', 'downloadImportTemplate'],
         'employee-import' => ['POST', 'importCsv'],
-
-        'employee-delete' => ['POST', 'delete'],
+        'employee-import-template' => ['GET', 'downloadImportTemplate'],
         'employee-bulk-delete' => ['POST', 'bulkDelete'],
 
         'departments' => ['GET', 'index'],
@@ -101,17 +93,16 @@ if (isset($_GET['page'])) {
     ];
 
     if (!isset($routes[$page])) {
-        http_response_code(404);
-        exit('Halaman tidak ditemukan.');
+        renderError(404);
     }
 
     [$expectedMethod, $action] = $routes[$page];
 
     if ($method !== $expectedMethod) {
         header('Allow: ' . $expectedMethod);
-        http_response_code(405);
-        exit('Metode permintaan tidak diizinkan.');
+        renderError(405);
     }
+
 
     $departmentPages = [
         'departments',
@@ -265,6 +256,20 @@ $cards = [
                             Jabatan
                         </a>
                     </li>
+                    <?php if (($_SESSION['auth_user']['role'] ?? '') === 'admin'): ?>
+                        <li class="nav-item">
+                            <a
+                                class="nav-link <?= ($_GET['page'] ?? '') === 'users' ||
+                                    str_starts_with((string) ($_GET['page'] ?? ''), 'user-')
+                                    ? 'active'
+                                    : '' ?>"
+                                href="index.php?page=users"
+                            >
+                                <i class="bi bi-shield-lock me-1"></i>
+                                Manajemen Pengguna
+                            </a>
+                        </li>
+                    <?php endif; ?>
                 </ul>
 
                 <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">

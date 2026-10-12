@@ -17,9 +17,9 @@ try {
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES => false,
     ]);
-} catch (PDOException $exception) {
-    error_log($exception->getMessage());
 
-    http_response_code(500);
-    exit('Koneksi database gagal. Periksa konfigurasi database.');
+} catch (PDOException $exception) {
+    error_log('Database connection failed: ' . $exception->getMessage());
+
+    renderError(500);
 }
