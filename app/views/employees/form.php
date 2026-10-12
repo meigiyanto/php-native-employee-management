@@ -1,10 +1,8 @@
-
 <?php
 $isEdit = isset($employee['id']);
 $pageTitle = $isEdit ? 'Edit Karyawan' : 'Tambah Karyawan';
 
-$value = static fn(string $key, mixed $default = '') =>
-    $employee[$key] ?? $default;
+$value = static fn(string $key, mixed $default = '') => $employee[$key] ?? $default;
 
 $selectedDepartment = (string) $value('department_id');
 $selectedPosition = (string) $value('position_id');

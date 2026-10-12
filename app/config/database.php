@@ -1,12 +1,13 @@
 <?php
 
 declare(strict_types=1);
+require_once __DIR__ . '/env.php';
 
 $host = getenv('DB_HOST') ?: '127.0.0.1';
 $port = getenv('DB_PORT') ?: '3306';
 $name = getenv('DB_NAME') ?: 'employee_management';
 $user = getenv('DB_USERNAME') ?: 'root';
-$password = getenv('DB_PASSWORD') ?: 'Gianto1405';
+$password = getenv('DB_PASSWORD') ?: '';
 
 $dsn = "mysql:host={$host};port={$port};dbname={$name};charset=utf8mb4";
 
