@@ -127,15 +127,11 @@ $backUrl = (string) ($errorBackUrl ?? 'index.php');
         <h1 class="error-title"><?= e($title) ?></h1>
         <p class="error-message"><?= e($message) ?></p>
 
+
         <div class="error-actions">
             <a class="btn btn-primary" href="<?= e($backUrl) ?>">
                 <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>
-                Kembali
-            </a>
-
-            <a class="btn btn-outline-secondary" href="index.php">
-                <i class="bi bi-house me-1" aria-hidden="true"></i>
-                Dashboard
+                <?= e($errorBackLabel ?? 'Kembali') ?>
             </a>
         </div>
 

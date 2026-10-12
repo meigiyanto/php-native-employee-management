@@ -109,7 +109,15 @@ function renderError(
     $errorTitle = $errors[$statusCode]['title'];
     $errorMessage = $message ?? $errors[$statusCode]['message'];
     $errorIcon = $errors[$statusCode]['icon'];
-    $errorBackUrl = 'index.php';
+    $isAuthenticated = !empty($_SESSION['auth_user']);
+
+    $errorBackUrl = $isAuthenticated
+        ? 'index.php'
+        : 'index.php?page=login';
+
+    $errorBackLabel = $isAuthenticated
+        ? 'Kembali ke Dashboard'
+        : 'Kembali ke Login';
 
     http_response_code($statusCode);
     header('Content-Type: text/html; charset=UTF-8');

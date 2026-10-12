@@ -147,6 +147,18 @@ if (isset($_GET['page'])) {
     exit;
 }
 
+if (empty($_SESSION['auth_user'])) {
+    redirect('index.php?page=login');
+}
+
+if (!in_array(
+    $_SESSION['auth_user']['role'] ?? '',
+    ['admin', 'hr'],
+    true
+)) {
+    renderError(403);
+}
+
 $controller = new DashboardController($pdo);
 $data = $controller->index();
 
