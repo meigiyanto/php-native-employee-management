@@ -62,6 +62,17 @@ if (isset($_GET['page'])) {
         'employee-update' => ['POST', 'update'],
         'employee-delete' => ['POST', 'delete'],
 
+        'employees' => ['GET', 'index'],
+        'employee-export' => ['GET', 'exportCsv'],
+        'employee-create' => ['GET', 'create'],
+
+        'employees' => ['GET', 'index'],
+        'employee-import-template' => ['GET', 'downloadImportTemplate'],
+        'employee-import' => ['POST', 'importCsv'],
+
+        'employee-delete' => ['POST', 'delete'],
+        'employee-bulk-delete' => ['POST', 'bulkDelete'],
+
         'departments' => ['GET', 'index'],
         'department-create' => ['GET', 'create'],
         'department-show' => ['GET', 'show'],

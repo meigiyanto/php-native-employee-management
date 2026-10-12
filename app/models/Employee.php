@@ -245,4 +245,39 @@ final class Employee
 
         return $stmt->rowCount() > 0;
     }
+
+    public function exportAll(
+        string $search = '',
+        array $filters = []
+    ): array {
+        [$where, $params] = $this->buildConditions($search, $filters);
+
+        $sql = 'SELECT
+                    e.employee_code,
+                    e.full_name,
+                    e.email,
+                    e.phone,
+                    e.gender,
+                    e.birth_date,
+                    e.hire_date,
+                    d.name AS department_name,
+                    p.name AS position_name,
+                    e.employment_status,
+                    e.salary,
+                    e.address
+                FROM employees e
+                JOIN departments d
+                    ON d.id = e.department_id
+                JOIN positions p
+                    ON p.id = e.position_id
+                   AND p.department_id = e.department_id'
+                . $where .
+                ' ORDER BY e.id DESC';
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }
