@@ -6,8 +6,11 @@ require_once __DIR__ . '/../app/helpers/functions.php';
 require_once __DIR__ . '/../app/config/database.php';
 
 require_once __DIR__ . '/../app/controllers/DashboardController.php';
+
 require_once __DIR__ . '/../app/models/User.php';
+require_once __DIR__ . '/../app/controllers/UserController.php';
 require_once __DIR__ . '/../app/controllers/AuthController.php';
+
 require_once __DIR__ . '/../app/models/Employee.php';
 require_once __DIR__ . '/../app/controllers/EmployeeController.php';
 require_once __DIR__ . '/../app/models/Department.php';
@@ -87,6 +90,14 @@ if (isset($_GET['page'])) {
         'position-store' => ['POST', 'store'],
         'position-update' => ['POST', 'update'],
         'position-delete' => ['POST', 'delete'],
+
+        // Manajemen pengguna — khusus admin
+        'users' => ['GET', 'index'],
+        'user-create' => ['GET', 'create'],
+        'user-store' => ['POST', 'store'],
+        'user-edit' => ['GET', 'edit'],
+        'user-update' => ['POST', 'update'],
+        'user-delete' => ['POST', 'delete'],
     ];
 
     if (!isset($routes[$page])) {
@@ -128,6 +139,16 @@ if (isset($_GET['page'])) {
     } elseif (in_array($page, $positionPages, true)) {
         $positionController = new PositionController($pdo);
         $positionController->$action();
+    } elseif (in_array($page, [
+        'users',
+        'user-create',
+        'user-store',
+        'user-edit',
+        'user-update',
+        'user-delete',
+    ], true)) {
+        $userController = new UserController($pdo);
+        $userController->$action();
     } else {
         $employeeController->$action();
     }
@@ -184,13 +205,8 @@ $cards = [
 
     <title>Dashboard | <?= e(APP_NAME) ?></title>
 
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    >
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
-        rel="stylesheet"
-    >
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
 </head>
 

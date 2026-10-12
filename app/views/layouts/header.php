@@ -32,6 +32,20 @@ $pageTitle = $pageTitle ?? 'Data Karyawan';
                     <li class="nav-item">
                         <a class="nav-link" href="index.php?page=positions">Jabatan</a>
                     </li>
+                    <?php if (($_SESSION['auth_user']['role'] ?? '') === 'admin'): ?>
+                        <li class="nav-item">
+                            <a
+                                class="nav-link <?= ($_GET['page'] ?? '') === 'users' ||
+                                    str_starts_with((string) ($_GET['page'] ?? ''), 'user-')
+                                    ? 'active'
+                                    : '' ?>"
+                                href="index.php?page=users"
+                            >
+                                <i class="bi bi-shield-lock me-1"></i>
+                                Manajemen Pengguna
+                            </a>
+                        </li>
+                    <?php endif; ?>
                     <!--
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
