@@ -62,9 +62,61 @@ final class EmployeeController
     {
         $search = trim((string) ($_GET['search'] ?? ''));
 
+        $departmentId = filter_var(
+            $_GET['department_id'] ?? null,
+            FILTER_VALIDATE_INT
+        );
+
+        $positionId = filter_var(
+            $_GET['position_id'] ?? null,
+            FILTER_VALIDATE_INT
+        );
+
+        $allowedStatuses = [
+            'active',
+            'inactive',
+            'on_leave',
+            'resigned',
+        ];
+
+        $status = (string) ($_GET['employment_status'] ?? '');
+
+        $filters = [
+            'department_id' => (
+                $departmentId !== false
+                && $departmentId !== null
+                && $departmentId > 0
+            ) ? $departmentId : null,
+
+            'position_id' => (
+                $positionId !== false
+                && $positionId !== null
+                && $positionId > 0
+            ) ? $positionId : null,
+
+            'employment_status' => in_array(
+                $status,
+                $allowedStatuses,
+                true
+            ) ? $status : '',
+        ];
+
+        $departments = $this->departments();
+
+        $positions = $this->pdo->query(
+            'SELECT p.id, p.name, p.department_id,
+                    d.name AS department_name
+             FROM positions p
+             JOIN departments d ON d.id = p.department_id
+             ORDER BY d.name, p.name'
+        )->fetchAll();
+
         $this->render('index', [
-            'employees' => $this->model()->all($search),
+            'employees' => $this->model()->all($search, $filters),
             'search' => $search,
+            'filters' => $filters,
+            'departments' => $departments,
+            'positions' => $positions,
         ]);
     }
 

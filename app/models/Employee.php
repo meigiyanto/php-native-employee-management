@@ -8,7 +8,8 @@ final class Employee
     {
     }
 
-    public function all(string $search = ''): array
+
+    public function all(string $search = '', array $filters = []): array
     {
         $sql = 'SELECT e.*, d.name AS department_name,
                        p.name AS position_name
@@ -18,19 +19,44 @@ final class Employee
                   ON p.id = e.position_id
                  AND p.department_id = e.department_id';
 
+        $conditions = [];
         $params = [];
 
         if ($search !== '') {
-            $sql .= ' WHERE e.employee_code LIKE :code
-                      OR e.full_name LIKE :name
-                      OR e.email LIKE :email';
+            $conditions[] = '(
+                e.employee_code LIKE :code
+                OR e.full_name LIKE :name
+                OR e.email LIKE :email
+                OR d.name LIKE :department_search
+                OR p.name LIKE :position_search
+            )';
 
             $term = '%' . $search . '%';
-            $params = [
-                'code' => $term,
-                'name' => $term,
-                'email' => $term,
-            ];
+
+            $params['code'] = $term;
+            $params['name'] = $term;
+            $params['email'] = $term;
+            $params['department_search'] = $term;
+            $params['position_search'] = $term;
+        }
+
+        if (!empty($filters['department_id'])) {
+            $conditions[] = 'e.department_id = :department_id';
+            $params['department_id'] = $filters['department_id'];
+        }
+
+        if (!empty($filters['position_id'])) {
+            $conditions[] = 'e.position_id = :position_id';
+            $params['position_id'] = $filters['position_id'];
+        }
+
+        if (!empty($filters['employment_status'])) {
+            $conditions[] = 'e.employment_status = :employment_status';
+            $params['employment_status'] = $filters['employment_status'];
+        }
+
+        if ($conditions) {
+            $sql .= ' WHERE ' . implode(' AND ', $conditions);
         }
 
         $sql .= ' ORDER BY e.id DESC';
