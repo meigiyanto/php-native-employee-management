@@ -111,13 +111,45 @@ final class EmployeeController
              ORDER BY d.name, p.name'
         )->fetchAll();
 
+        $model = $this->model();
+
+        $perPage = 10;
+        $totalEmployees = $model->countAll($search, $filters);
+        $totalPages = max(1, (int) ceil($totalEmployees / $perPage));
+
+        $requestedPage = filter_var(
+            $_GET['p'] ?? 1,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]]
+        );
+
+        $currentPage = $requestedPage === false
+            ? 1
+            : min($requestedPage, $totalPages);
+
+        $offset = ($currentPage - 1) * $perPage;
+
+        $employees = $model->all(
+            $search,
+            $filters,
+            $perPage,
+            $offset
+        );
+
         $this->render('index', [
-            'employees' => $this->model()->all($search, $filters),
+            'employees' => $employees,
             'search' => $search,
             'filters' => $filters,
             'departments' => $departments,
             'positions' => $positions,
+            'currentPage' => $currentPage,
+            'perPage' => $perPage,
+            'totalEmployees' => $totalEmployees,
+            'totalPages' => $totalPages,
+            'startRecord' => $totalEmployees > 0 ? $offset + 1 : 0,
+            'endRecord' => min($offset + $perPage, $totalEmployees),
         ]);
+
     }
 
     public function create(): void

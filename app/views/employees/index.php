@@ -104,7 +104,7 @@
         </form>
 
         <div class="table-responsive mt-4">
-            <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover align-middle mb-0 text-nowrap">
                 <thead class="table-light">
                     <tr>
                         <th></th>
@@ -124,7 +124,7 @@
                         </td>
                     </tr>
                 <?php else: ?>
-                    <?php $i = 1; ?>
+                    <?php $i = $startRecord; ?>
                     <?php foreach ($employees as $item): ?>
                         <tr>
                             <td><?= $i++ ?></td>
@@ -180,6 +180,91 @@
                 <?php endif; ?>
                 </tbody>
             </table>
+
+<?php
+$paginationParams = ['page' => 'employees'];
+
+if ($search !== '') {
+    $paginationParams['search'] = $search;
+}
+
+if (!empty($filters['department_id'])) {
+    $paginationParams['department_id'] = $filters['department_id'];
+}
+
+if (!empty($filters['position_id'])) {
+    $paginationParams['position_id'] = $filters['position_id'];
+}
+
+if (!empty($filters['employment_status'])) {
+    $paginationParams['employment_status'] = $filters['employment_status'];
+}
+
+$firstPage = max(1, $currentPage - 2);
+$lastPage = min($totalPages, $currentPage + 2);
+?>
+
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-4">
+
+                <p class="text-secondary small mb-0">
+                    Menampilkan <?= $startRecord ?>–<?= $endRecord ?>
+                    dari <?= $totalEmployees ?> karyawan
+                </p>
+
+                <?php if ($totalPages > 1): ?>
+                    <nav aria-label="Navigasi halaman data karyawan">
+                        <ul class="pagination pagination-sm mb-0">
+
+                            <?php $previousPage = $currentPage - 1; ?>
+                            <li class="page-item <?= $currentPage <= 1 ? 'disabled' : '' ?>">
+                                <?php if ($currentPage > 1): ?>
+                                    <a class="page-link"
+                                       href="?<?= e(http_build_query(
+                                           array_merge($paginationParams, ['p' => $previousPage])
+                                       )) ?>">
+                                        Sebelumnya
+                                    </a>
+                                <?php else: ?>
+                                    <span class="page-link">Sebelumnya</span>
+                                <?php endif; ?>
+                            </li>
+
+                            <?php for ($number = $firstPage; $number <= $lastPage; $number++): ?>
+                                <li class="page-item <?= $number === $currentPage ? 'active' : '' ?>">
+                                    <?php if ($number === $currentPage): ?>
+                                        <span class="page-link" aria-current="page">
+                                            <?= $number ?>
+                                        </span>
+                                    <?php else: ?>
+                                        <a class="page-link"
+                                           href="?<?= e(http_build_query(
+                                               array_merge($paginationParams, ['p' => $number])
+                                           )) ?>">
+                                            <?= $number ?>
+                                        </a>
+                                    <?php endif; ?>
+                                </li>
+                            <?php endfor; ?>
+
+                            <?php $nextPage = $currentPage + 1; ?>
+                            <li class="page-item <?= $currentPage >= $totalPages ? 'disabled' : '' ?>">
+                                <?php if ($currentPage < $totalPages): ?>
+                                    <a class="page-link"
+                                       href="?<?= e(http_build_query(
+                                           array_merge($paginationParams, ['p' => $nextPage])
+                                       )) ?>">
+                                        Berikutnya
+                                    </a>
+                                <?php else: ?>
+                                    <span class="page-link">Berikutnya</span>
+                                <?php endif; ?>
+                            </li>
+
+                        </ul>
+                    </nav>
+                <?php endif; ?>
+            </div>
+
         </div>
 
     </div>

@@ -8,17 +8,8 @@ final class Employee
     {
     }
 
-
-    public function all(string $search = '', array $filters = []): array
+    private function buildConditions(string $search, array $filters): array
     {
-        $sql = 'SELECT e.*, d.name AS department_name,
-                       p.name AS position_name
-                FROM employees e
-                JOIN departments d ON d.id = e.department_id
-                JOIN positions p
-                  ON p.id = e.position_id
-                 AND p.department_id = e.department_id';
-
         $conditions = [];
         $params = [];
 
@@ -55,16 +46,59 @@ final class Employee
             $params['employment_status'] = $filters['employment_status'];
         }
 
-        if ($conditions) {
-            $sql .= ' WHERE ' . implode(' AND ', $conditions);
-        }
+        $where = $conditions
+            ? ' WHERE ' . implode(' AND ', $conditions)
+            : '';
 
-        $sql .= ' ORDER BY e.id DESC';
+        return [$where, $params];
+    }
+
+    public function all(
+        string $search = '',
+        array $filters = [],
+        int $limit = 10,
+        int $offset = 0
+    ): array {
+        $limit = max(1, min($limit, 100));
+        $offset = max(0, $offset);
+
+        [$where, $params] = $this->buildConditions($search, $filters);
+
+        $sql = 'SELECT e.*, d.name AS department_name,
+                       p.name AS position_name
+                FROM employees e
+                JOIN departments d ON d.id = e.department_id
+                JOIN positions p
+                  ON p.id = e.position_id
+                 AND p.department_id = e.department_id'
+                . $where .
+                ' ORDER BY e.id DESC
+                  LIMIT ' . $limit . ' OFFSET ' . $offset;
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
 
         return $stmt->fetchAll();
+    }
+
+    public function countAll(
+        string $search = '',
+        array $filters = []
+    ): int {
+        [$where, $params] = $this->buildConditions($search, $filters);
+
+        $sql = 'SELECT COUNT(*)
+                FROM employees e
+                JOIN departments d ON d.id = e.department_id
+                JOIN positions p
+                  ON p.id = e.position_id
+                 AND p.department_id = e.department_id'
+                . $where;
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
     }
 
     public function find(int $id): ?array
