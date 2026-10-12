@@ -23,6 +23,9 @@ $pageTitle = $pageTitle ?? 'Data Karyawan';
         <a class="btn btn-sm btn-outline-light" href="index.php">
             Dashboard
         </a>
+        <a class="btn btn-sm btn-outline-light" href="index.php?page=departments">
+            Departemen
+        </a>
     </div>
 </nav>
 <main class="container-fluid px-3 px-lg-4 py-4">
